@@ -1,0 +1,78 @@
+// prisma/schema.prisma
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+// 1. Customer Model (Based on Table 1: Customer Profile, plus essential email)
+model Customer {
+    id                       String    @id @default(uuid())
+    firstName                String
+    lastName                 String
+    middleName               String?
+    dateOfBirth              DateTime?
+    homeAddress              String?
+    registeredAt             DateTime  @default(now()) @map("date_of_registration")
+
+    email String @unique // Added: Essential for customer identity and "management"
+
+    // Standard auditing fields
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    orders Order[] // One-to-many relationship with Order
+}
+
+// 2. MenuItem Model (Minimal representation of what's ordered)
+model MenuItem {
+    id    String  @id @default(uuid())
+    name  String  @unique // Essential: Represents "Menu item ordered" (by name)
+    price Decimal @db.Decimal(10, 2) // Essential: Allows calculating order totals if needed later
+
+    // Standard auditing fields
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    orderItems OrderItem[] // A menu item can be part of many order items
+}
+
+// 3. Order Model (Based on Table 2: Order History, plus essential status)
+model Order {
+    id                  String    @id @default(uuid())
+    customerId          String
+    customer            Customer  @relation(fields: [customerId], references: [id])
+    orderDate           DateTime  @default(now()) @map("order_date") // From Table 2: a. Order date
+    specialInstructions String?   @map("special_instructions") // From Table 2: c. Special instructions (Optional)
+    paymentMethod       String?   @map("payment_method") // From Table 2: d. Payment method (Optional)
+    nextReservationDate DateTime? @map("next_reservation_date") // From Table 2: e. Next reservation date (Optional)
+
+    status String @default("Pending") // Added: Crucial for basic order tracking (e.g., Pending, Completed)
+
+    // Standard auditing fields
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    orderItems OrderItem[] // One-to-many relationship with Order
+}
+
+// 4. OrderItem Model (Minimal Junction Table for Order and MenuItem - links items to orders)
+model OrderItem {
+    id         String @id @default(uuid())
+    orderId    String
+    menuItemId String
+    quantity   Int // How many of this menuItem are in this order
+
+    // Standard auditing fields
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    order    Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+    menuItem MenuItem @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+
+    @@unique([orderId, menuItemId]) // Ensures a unique entry for an item in a specific order
+}
