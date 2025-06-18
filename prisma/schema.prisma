@@ -28,7 +28,7 @@ model Customer {
 }
 
 model Order {
-    id                  String    @id @default(uuid())
+    id                  Int       @id @default(autoincrement())
     customerId          String
     customer            Customer  @relation(fields: [customerId], references: [id])
     orderDate           DateTime  @default(now()) @map("order_date") // From Table 2: a. Order date

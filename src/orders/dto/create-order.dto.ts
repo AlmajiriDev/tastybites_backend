@@ -1,7 +1,5 @@
-// src/orders/dto/create-order.dto.ts
 import {
   IsArray,
-  IsDateString,
   IsNotEmpty,
   IsOptional,
   IsString,
