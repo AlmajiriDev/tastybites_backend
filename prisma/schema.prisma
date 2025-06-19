@@ -8,29 +8,29 @@ datasource db {
 }
 
 model Customer {
-    id                     String    @id @default(uuid())
+    id                     String   @id @default(uuid())
     firstName              String
     lastName               String
     middleName             String?
-    dateOfBirth            DateTime?
+    dateOfBirth            String?
     homeAddress            String?
-    registeredAt           DateTime  @default(now()) @map("date_of_registration")
+    registeredAt           DateTime @default(now()) @map("date_of_registration")
     isMatricNo_23120112027 Boolean
-    createdAt              DateTime  @default(now())
-    updatedAt              DateTime  @updatedAt
+    createdAt              DateTime @default(now())
+    updatedAt              DateTime @updatedAt
 
     orders Order[]
 }
 
 model Order {
-    id                  String    @id @default(uuid())
+    id                  String   @id @default(uuid())
     customerId          String
-    customer            Customer  @relation(fields: [customerId], references: [id])
-    orderDate           DateTime  @default(now()) @map("order_date")
+    customer            Customer @relation(fields: [customerId], references: [id])
+    orderDate           DateTime @default(now()) @map("order_date")
     menuItems           String[]
-    specialInstructions String?   @map("special_instructions")
-    paymentMethod       String?   @map("payment_method")
-    nextReservationDate DateTime? @map("next_reservation_date")
+    specialInstructions String?  @map("special_instructions")
+    paymentMethod       String?  @map("payment_method")
+    nextReservationDate String?  @map("next_reservation_date")
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

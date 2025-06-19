@@ -39,12 +39,12 @@ export class OrdersController {
     return this.ordersService.findAll();
   }
 
-  @Get(':id') // Route: /orders/:id
+  @Get(':id')
   async findOne(@Param('id') id: string): Promise<Order> {
     return this.ordersService.findOne(id);
   }
 
-  @Patch(':id') // Use Patch for partial updates
+  @Patch(':id')
   async update(
     @Param('id') id: string,
     @Body() updateOrderDto: UpdateOrderDto,
@@ -53,7 +53,7 @@ export class OrdersController {
   }
 
   @Delete(':id')
-  @HttpCode(HttpStatus.NO_CONTENT) // Respond with 204 No Content for successful deletion
+  @HttpCode(HttpStatus.NO_CONTENT)
   async remove(@Param('id') id: string): Promise<Order> {
     return this.ordersService.remove(id);
   }

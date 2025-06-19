@@ -1,23 +1,15 @@
-// src/customers/customers.service.ts
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service'; // Import PrismaService
+import { PrismaService } from '../prisma/prisma.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
-import { Customer } from '@prisma/client'; // Import Prisma's generated Customer type
+import { Customer } from '@prisma/client';
 
 @Injectable()
 export class CustomersService {
-  constructor(private prisma: PrismaService) {} // Inject PrismaService
+  constructor(private prisma: PrismaService) {}
 
   async create(createCustomerDto: CreateCustomerDto): Promise<Customer> {
-    // Ensure dateOfBirth is converted to a Date object if it's a string from DTO
-    const data = {
-      ...createCustomerDto,
-      dateOfBirth: createCustomerDto.dateOfBirth
-        ? new Date(createCustomerDto.dateOfBirth)
-        : undefined,
-    };
-    return this.prisma.customer.create({ data });
+    return this.prisma.customer.create({ data: createCustomerDto });
   }
 
   async findAll(): Promise<Customer[]> {
@@ -38,11 +30,10 @@ export class CustomersService {
     id: string,
     updateCustomerDto: UpdateCustomerDto,
   ): Promise<Customer> {
-    // Ensure dateOfBirth is converted to a Date object if it's a string from DTO
     const data = {
       ...updateCustomerDto,
       dateOfBirth: updateCustomerDto.dateOfBirth
-        ? new Date(updateCustomerDto.dateOfBirth)
+        ? new Date(updateCustomerDto.dateOfBirth).toISOString()
         : undefined,
     };
     try {
@@ -51,7 +42,6 @@ export class CustomersService {
         data,
       });
     } catch (error) {
-      // Handle cases where customer might not exist for update (e.g., P2025)
       if (
         typeof error === 'object' &&
         error !== null &&
@@ -63,7 +53,7 @@ export class CustomersService {
           `Customer with ID "${id}" not found for update.`,
         );
       }
-      throw error; // Re-throw other errors
+      throw error;
     }
   }
 
@@ -84,7 +74,7 @@ export class CustomersService {
           `Customer with ID "${id}" not found for deletion.`,
         );
       }
-      throw error; // Re-throw other errors
+      throw error;
     }
   }
 }

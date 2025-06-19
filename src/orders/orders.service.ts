@@ -1,27 +1,14 @@
-// src/orders/orders.service.ts
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
-import { Order } from '@prisma/client'; // Import Prisma's generated Order type
+import { Order } from '@prisma/client';
 
 @Injectable()
 export class OrdersService {
   constructor(private prisma: PrismaService) {}
 
   async create(createOrderDto: CreateOrderDto): Promise<Order> {
-    // Ensure orderDate and nextReservationDate are converted to Date objects
-    const data = {
-      ...createOrderDto,
-      orderDate: createOrderDto.orderDate
-        ? new Date(createOrderDto.orderDate)
-        : undefined,
-      nextReservationDate: createOrderDto.nextReservationDate
-        ? new Date(createOrderDto.nextReservationDate)
-        : undefined,
-    };
-
-    // Ensure the customer exists before creating the order
     const customerExists = await this.prisma.customer.findUnique({
       where: { id: createOrderDto.customerId },
     });
@@ -32,19 +19,19 @@ export class OrdersService {
       );
     }
 
-    return this.prisma.order.create({ data });
+    return this.prisma.order.create({ data: createOrderDto });
   }
 
   async findAll(): Promise<Order[]> {
     return this.prisma.order.findMany({
-      include: { customer: true }, // Include customer details with the order
+      include: { customer: true },
     });
   }
 
   async findOne(id: string): Promise<Order> {
     const order = await this.prisma.order.findUnique({
       where: { id },
-      include: { customer: true }, // Include customer details
+      include: { customer: true },
     });
     if (!order) {
       throw new NotFoundException(`Order with ID "${id}" not found.`);
@@ -53,7 +40,6 @@ export class OrdersService {
   }
 
   async update(id: string, updateOrderDto: UpdateOrderDto): Promise<Order> {
-    // Ensure date fields are converted to Date objects if present in DTO
     const data: UpdateOrderDto = { ...updateOrderDto };
     if (updateOrderDto.orderDate) {
       data.orderDate = new Date(updateOrderDto.orderDate).toISOString();
@@ -64,7 +50,6 @@ export class OrdersService {
       ).toISOString();
     }
 
-    // If customerId is being updated, ensure the new customer exists
     if (updateOrderDto.customerId) {
       const newCustomerExists = await this.prisma.customer.findUnique({
         where: { id: updateOrderDto.customerId },
