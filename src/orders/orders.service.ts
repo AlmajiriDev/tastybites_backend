@@ -41,7 +41,7 @@ export class OrdersService {
     });
   }
 
-  async findOne(id: number): Promise<Order> {
+  async findOne(id: string): Promise<Order> {
     const order = await this.prisma.order.findUnique({
       where: { id },
       include: { customer: true }, // Include customer details
@@ -52,7 +52,7 @@ export class OrdersService {
     return order;
   }
 
-  async update(id: number, updateOrderDto: UpdateOrderDto): Promise<Order> {
+  async update(id: string, updateOrderDto: UpdateOrderDto): Promise<Order> {
     // Ensure date fields are converted to Date objects if present in DTO
     const data: UpdateOrderDto = { ...updateOrderDto };
     if (updateOrderDto.orderDate) {
@@ -97,7 +97,7 @@ export class OrdersService {
     }
   }
 
-  async remove(id: number): Promise<Order> {
+  async remove(id: string): Promise<Order> {
     try {
       return await this.prisma.order.delete({
         where: { id },

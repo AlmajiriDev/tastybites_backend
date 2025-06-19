@@ -8,7 +8,7 @@ datasource db {
 }
 
 model Customer {
-    id                     Int       @id @default(autoincrement())
+    id                     String    @id @default(uuid())
     firstName              String
     lastName               String
     middleName             String?
@@ -19,12 +19,12 @@ model Customer {
     createdAt              DateTime  @default(now())
     updatedAt              DateTime  @updatedAt
 
-    orders Order[] // One-to-many relationship with Order
+    orders Order[]
 }
 
 model Order {
-    id                  Int       @id @default(autoincrement())
-    customerId          Int
+    id                  String    @id @default(uuid())
+    customerId          String
     customer            Customer  @relation(fields: [customerId], references: [id])
     orderDate           DateTime  @default(now()) @map("order_date")
     menuItems           String[]
